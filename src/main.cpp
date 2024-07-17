@@ -24,6 +24,7 @@
 #define JUPITER_PATH "../image/Jupiter.png"
 #define SATURN_PATH "../image/Saturn.png"
 #define URANUS_PATH "../image/Uranus.png"
+#define NEPTUNE_PATH "../image/Neptune.png"
 
 using namespace std;
 
@@ -123,7 +124,8 @@ bool loadObjects(SDL_Renderer* renderer) {
            createObject(renderer, MERCURY_PATH, 15, 160, 4) && createObject(renderer, VENUS_PATH, 30, 220, 1.5) &&
            createObject(renderer, EARTH_PATH, 36, 320, 1) && createObject(renderer, MOON_PATH, 12, 60, 12, true) &&
            createObject(renderer, MARS_PATH, 25, 500, 0.5) && createObject(renderer, JUPITER_PATH, 150, 750, 0.1) &&
-           createObject(renderer, SATURN_PATH, 120, 800, 0.06) && createObject(renderer, URANUS_PATH, 100, 900, 0.04);
+           createObject(renderer, SATURN_PATH, 120, 800, 0.06) && createObject(renderer, URANUS_PATH, 100, 900, 0.04) &&
+           createObject(renderer, NEPTUNE_PATH, 100, 950, 0.02);
 }
 
 int main() {
