@@ -12,9 +12,6 @@
 #include <thread>
 #include <vector>
 
-#define SCREEN_WIDTH 1920
-#define SCREEN_HEIGHT 1080
-
 #define MUSIC_PATH "../music/CornfieldChase.wav"
 
 #define COSMOS_PATH "../image/Cosmos.jpg"
@@ -26,6 +23,7 @@
 #define MARS_PATH "../image/Mars.png"
 #define JUPITER_PATH "../image/Jupiter.png"
 #define SATURN_PATH "../image/Saturn.png"
+#define URANUS_PATH "../image/Uranus.png"
 
 using namespace std;
 
@@ -47,8 +45,8 @@ public:
             return;
         }
         angle += angleInc;
-        int y = round(radius * sin(angle / 180 * M_PI) * sqrt(2) / 4);
-        int x = round(radius * cos(angle / 180 * M_PI) - y);
+        int y = round(radius * sin(angle / 180.0 * M_PI) * sqrt(2) / 4.0);
+        int x = round(radius * cos(angle / 180.0 * M_PI) - y);
 
         if (isMoon) {
             // add the earth's coordinate
@@ -104,6 +102,7 @@ bool createObject(SDL_Renderer* renderer, string path, int size, double r, doubl
 
     obj->radius = r;
 
+    srand(time(0));
     obj->angle = rand() % 360;
 
     obj->angleInc = inc;
@@ -121,10 +120,10 @@ void destoryObject() {
 
 bool loadObjects(SDL_Renderer* renderer) {
     return createObject(renderer, COSMOS_PATH, 0, 0, 0) && createObject(renderer, SUN_PATH, 400, 0, 0) &&
-           createObject(renderer, MERCURY_PATH, 15, 160, 1) && createObject(renderer, VENUS_PATH, 30, 220, 0.375) &&
-           createObject(renderer, EARTH_PATH, 36, 320, 0.25) && createObject(renderer, MOON_PATH, 12, 60, 3, true) &&
-           createObject(renderer, MARS_PATH, 25, 500, 0.125) && createObject(renderer, JUPITER_PATH, 150, 750, 0.025) &&
-           createObject(renderer, SATURN_PATH, 180, 800, 0.015);
+           createObject(renderer, MERCURY_PATH, 15, 160, 4) && createObject(renderer, VENUS_PATH, 30, 220, 1.5) &&
+           createObject(renderer, EARTH_PATH, 36, 320, 1) && createObject(renderer, MOON_PATH, 12, 60, 12, true) &&
+           createObject(renderer, MARS_PATH, 25, 500, 0.5) && createObject(renderer, JUPITER_PATH, 150, 750, 0.1) &&
+           createObject(renderer, SATURN_PATH, 120, 800, 0.06) && createObject(renderer, URANUS_PATH, 100, 900, 0.04);
 }
 
 int main() {
@@ -146,8 +145,8 @@ int main() {
     // reduce 50% volume
     Mix_VolumeChunk(sound, 64);
 
-    SDL_Window* window = SDL_CreateWindow("SolarSystemModel", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                          SCREEN_WIDTH, SCREEN_HEIGHT, 0);
+    SDL_Window* window = SDL_CreateWindow("SolarSystemModel", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 0, 0,
+                                          SDL_WINDOW_FULLSCREEN);
 
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
@@ -186,13 +185,13 @@ int main() {
         SDL_RenderPresent(renderer);
 
         while (SDL_PollEvent(&e) != 0) {
-            if (e.type == SDL_QUIT) {
+            if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE)) {
                 quit = true;
                 break;
             }
         }
 
-        this_thread::sleep_for(chrono::milliseconds(10));
+        this_thread::sleep_for(chrono::milliseconds(60));
     }
 
     clearSDL();

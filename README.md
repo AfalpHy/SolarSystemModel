@@ -10,6 +10,8 @@ cd build
 cmake ..
 make
 ~~~
+# Usage
+enter `ESC` to quit
 # Image
 ![](example1.png)
 ![](example2.png)
