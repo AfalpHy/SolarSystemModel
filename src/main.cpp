@@ -32,13 +32,15 @@ class Object {
 private:
     SDL_Texture* texture = nullptr;
     SDL_Rect* rect = nullptr;
-    double radius = 0;
+    double sizeScale = 0;
+    double radiusScale = 0;
     double angle = 0;
     double angleInc = 0;
     bool isMoon = false;
 
 public:
-    friend bool createObject(SDL_Renderer* renderer, string path, int size, double r, double inc, bool isMoon);
+    friend bool createObject(SDL_Renderer* renderer, string path, double sizeScale, double radiusScale, double inc,
+                             bool isMoon);
 
     void calculateNextPos(SDL_Window* window) {
         // background
@@ -46,6 +48,11 @@ public:
             return;
         }
         angle += angleInc;
+        int width, height;
+        SDL_GetWindowSize(window, &width, &height);
+        rect->w = rect->h = width * sizeScale;
+        double radius = width * radiusScale;
+
         int y = round(radius * sin(angle / 180.0 * M_PI) * sqrt(2) / 4.0);
         int x = round(radius * cos(angle / 180.0 * M_PI) - y);
 
@@ -54,8 +61,6 @@ public:
             rect->y = objects[4]->getY() - y - rect->h / 2;
             rect->x = objects[4]->getX() - x - rect->w / 2;
         } else {
-            int width, height;
-            SDL_GetWindowSize(window, &width, &height);
             rect->y = height / 2 - y - rect->h / 2;
             rect->x = width / 2 - x - rect->w / 2;
         }
@@ -84,7 +89,8 @@ public:
 
 vector<Object*> Object::objects;
 
-bool createObject(SDL_Renderer* renderer, string path, int size, double r, double inc, bool isMoon = false) {
+bool createObject(SDL_Renderer* renderer, string path, double sizeScale, double radiusScale, double inc,
+                  bool isMoon = false) {
     Object* obj = new Object;
     SDL_Surface* suface = IMG_Load(path.c_str());
     if (suface == nullptr) {
@@ -93,16 +99,15 @@ bool createObject(SDL_Renderer* renderer, string path, int size, double r, doubl
     }
     obj->texture = SDL_CreateTextureFromSurface(renderer, suface);
 
-    if (size > 0) {
+    if (sizeScale > 0) {
         obj->rect = new SDL_Rect();
-        obj->rect->h = size;
-        obj->rect->w = size;
+        obj->rect->h = 0;
+        obj->rect->w = 0;
         obj->rect->x = 0;
         obj->rect->y = 0;
     }
-
-    obj->radius = r;
-
+    obj->sizeScale = sizeScale;
+    obj->radiusScale = radiusScale;
     srand(time(0));
     obj->angle = rand() % 360;
 
@@ -120,12 +125,15 @@ void destoryObject() {
 }
 
 bool loadObjects(SDL_Renderer* renderer) {
-    return createObject(renderer, COSMOS_PATH, 0, 0, 0) && createObject(renderer, SUN_PATH, 400, 0, 0) &&
-           createObject(renderer, MERCURY_PATH, 15, 160, 4) && createObject(renderer, VENUS_PATH, 30, 220, 1.5) &&
-           createObject(renderer, EARTH_PATH, 36, 320, 1) && createObject(renderer, MOON_PATH, 12, 60, 12, true) &&
-           createObject(renderer, MARS_PATH, 25, 500, 0.5) && createObject(renderer, JUPITER_PATH, 150, 750, 0.1) &&
-           createObject(renderer, SATURN_PATH, 120, 800, 0.06) && createObject(renderer, URANUS_PATH, 100, 900, 0.04) &&
-           createObject(renderer, NEPTUNE_PATH, 100, 950, 0.02);
+    return createObject(renderer, COSMOS_PATH, 0, 0, 0) && createObject(renderer, SUN_PATH, 0.15625, 0, 0) &&
+           createObject(renderer, MERCURY_PATH, 0.006, 0.0625, 4) &&
+           createObject(renderer, VENUS_PATH, 0.012, 0.086, 1.5) &&
+           createObject(renderer, EARTH_PATH, 0.015, 0.125, 1) &&
+           createObject(renderer, MOON_PATH, 0.005, 0.025, 12, true) &&
+           createObject(renderer, MARS_PATH, 0.01, 0.2, 0.5) && createObject(renderer, JUPITER_PATH, 0.06, 0.3, 0.25) &&
+           createObject(renderer, SATURN_PATH, 0.05, 0.45, 0.2) &&
+           createObject(renderer, URANUS_PATH, 0.045, 0.55, 0.15) &&
+           createObject(renderer, NEPTUNE_PATH, 0.045, 0.75, 0.1);
 }
 
 int main() {
@@ -148,7 +156,7 @@ int main() {
     Mix_VolumeChunk(sound, 64);
 
     SDL_Window* window = SDL_CreateWindow("SolarSystemModel", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 0, 0,
-                                          SDL_WINDOW_FULLSCREEN);
+                                          SDL_WINDOW_FULLSCREEN_DESKTOP);
 
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
