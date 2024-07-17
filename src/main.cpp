@@ -47,7 +47,7 @@ public:
         if (rect == nullptr) {
             return;
         }
-        angle += angleInc;
+        angle -= angleInc;
         int width, height;
         SDL_GetWindowSize(window, &width, &height);
         rect->w = rect->h = width * sizeScale;
